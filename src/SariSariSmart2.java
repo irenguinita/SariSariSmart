@@ -1,4 +1,4 @@
-package Capstone2;
+//package Capstone2;
 
 import javax.swing.*;
 import javax.swing.border.*;
@@ -30,11 +30,6 @@ public class SariSariSmart2 {
         });
     }
 }
-//test change'-
-// test 2
-//test 3 push
-// lololo
-//testing testing
 // stylings
 class Theme {
     public static final Color BACKGROUND = new Color(245, 244, 235);
