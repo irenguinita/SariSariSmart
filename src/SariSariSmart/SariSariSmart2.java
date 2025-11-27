@@ -1,9 +1,10 @@
 package SariSariSmart;
 
-import Database.CustomException.DuplicateUserException;
-import Database.CustomException.LoginFailedException;
-import Database.User;
-import Database.UserManager;
+import Database.Users.CustomException.DuplicateUserException;
+import Database.Users.CustomException.LoginFailedException;
+import Database.Users.CustomException.SignUpFailedException;
+import Database.Users.User;
+import Database.Users.UserManager;
 
 import javax.swing.*;
 import javax.swing.border.*;
@@ -410,6 +411,7 @@ class LoginFrame extends JFrame {
 
             if (!pass.equals(confirmPass)){
                 // status label here
+                throw new SignUpFailedException("Passwords does not match.");
             }
 
             try {
@@ -424,6 +426,10 @@ class LoginFrame extends JFrame {
 
             } catch (DuplicateUserException ex) {
                 // status label here
+                System.err.println("ERROR: User already exist. " + ex.getMessage());
+            } catch (SignUpFailedException ex) {
+                // status label here
+                System.err.println("ERROR: Passwords does not match. " + ex.getMessage());
             } catch (IOException ex) {
                 System.err.println("ERROR: Could not create an account. " + ex.getMessage());
             }

@@ -1,8 +1,8 @@
-package Database;
+package Database.Users;
 
-import Database.CustomException.DuplicateUserException;
-import Database.CustomException.LoginFailedException;
-import Database.CustomException.UserNotFound;
+import Database.Users.CustomException.DuplicateUserException;
+import Database.Users.CustomException.LoginFailedException;
+import Database.Users.CustomException.UserNotFound;
 
 import java.io.*;
 import java.time.LocalDateTime;

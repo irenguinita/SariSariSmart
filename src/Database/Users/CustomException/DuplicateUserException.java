@@ -1,4 +1,4 @@
-package Database.CustomException;
+package Database.Users.CustomException;
 
 public class DuplicateUserException extends RuntimeException {
     public DuplicateUserException(String message) {

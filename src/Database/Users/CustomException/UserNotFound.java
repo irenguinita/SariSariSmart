@@ -1,4 +1,4 @@
-package Database.CustomException;
+package Database.Users.CustomException;
 
 public class UserNotFound extends RuntimeException {
     public UserNotFound(String message) {

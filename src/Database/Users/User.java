@@ -1,4 +1,4 @@
-package Database;
+package Database.Users;
 
 public class User {
     private String username;
