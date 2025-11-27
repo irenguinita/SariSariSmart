@@ -84,7 +84,6 @@ class Theme {
         table.setSelectionBackground(ACCENT);
         table.setSelectionForeground(TEXT_MAIN);
 
-        // a custom renderer that handles background colors and removes the cell focus border
         table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
@@ -128,12 +127,6 @@ class Theme {
     }
 }
 
-
-
-
-
-
-// ------------------- MOCK SERVICE -------------------
 class MockDataService {
     private List<Product> products = new ArrayList<>();
     private List<Customer> customers = new ArrayList<>();
@@ -159,11 +152,17 @@ class MockDataService {
     public List<Transaction> getTransactions() { return transactions; }
 }
 
-// ------------------- LOG IN FRAME (CENTERED) -------------------
+// ------------------- FRAMES -------------------
 class LoginFrame extends JFrame {
     MockDataService dataService;
     JPanel cardPanel;
     CardLayout cardLayout;
+
+    JLabel logoLabel;
+    JLabel titleLabel;
+    JPanel topPanel;
+    JPanel gapSpacer;
+    ImageIcon originalLogoIcon;
 
     public LoginFrame(MockDataService dataService) {
         this.dataService = dataService;
@@ -178,25 +177,23 @@ class LoginFrame extends JFrame {
         mainContainer.setLayout(new BorderLayout());
         setContentPane(mainContainer);
 
-        // --- Header Section ---
-        JPanel topPanel = new JPanel();
+        topPanel = new JPanel();
         topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
         topPanel.setBackground(Theme.BACKGROUND);
-        // Reduced bottom padding so centered card looks better
-        topPanel.setBorder(BorderFactory.createEmptyBorder(40, 0, 10, 0));
+        topPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
 
-        JLabel logoLabel = new JLabel();
+        logoLabel = new JLabel();
         logoLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
         try {
-            ImageIcon logoIcon = new ImageIcon(getClass().getResource("/SariSariSmart_Logo.png"));
-            Image scaledIcon = logoIcon.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
-            logoLabel.setIcon(new ImageIcon(scaledIcon));
+            originalLogoIcon = new ImageIcon(getClass().getResource("/SariSariSmart_Logo.png"));
         } catch (Exception e) {
+            originalLogoIcon = null;
             logoLabel.setText("[LOGO]");
         }
         logoLabel.setFont(Theme.FONT_HEADER);
 
-        JLabel titleLabel = new JLabel("Sari-Sari Smart");
+        titleLabel = new JLabel("Sari-Sari Smart");
         titleLabel.setFont(Theme.FONT_HEADER);
         titleLabel.setForeground(Theme.PRIMARY);
         titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -204,31 +201,80 @@ class LoginFrame extends JFrame {
 
         topPanel.add(logoLabel);
         topPanel.add(titleLabel);
-        mainContainer.add(topPanel, BorderLayout.NORTH);
 
-        // --- Card Area (Center) ---
         cardLayout = new CardLayout();
         cardPanel = new JPanel(cardLayout);
         cardPanel.setBackground(Theme.BACKGROUND);
-        // We remove large border padding here to let GridBag center freely
         cardPanel.setBorder(null);
 
         cardPanel.add(createLoginPanel(), "LOGIN");
         cardPanel.add(createSignupPanel(), "SIGNUP");
+        cardPanel.add(createForgotPasswordPanel(), "FORGOT_PASSWORD");
 
-        mainContainer.add(cardPanel, BorderLayout.CENTER);
+        JPanel centralGroup = new JPanel(new GridBagLayout());
+        centralGroup.setBackground(Theme.BACKGROUND);
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.CENTER;
+
+        centralGroup.add(topPanel, gbc);
+
+        gbc.gridy = 1;
+        gapSpacer = new JPanel();
+        gapSpacer.setBackground(Theme.BACKGROUND);
+        // Default small spacer, updated in listener
+        gapSpacer.setPreferredSize(new Dimension(1, 10));
+        centralGroup.add(gapSpacer, gbc);
+
+        gbc.gridy = 2;
+        centralGroup.add(cardPanel, gbc);
+
+        mainContainer.add(centralGroup, BorderLayout.CENTER);
+
+        this.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                adjustHeaderSize();
+            }
+        });
+
+        SwingUtilities.invokeLater(this::adjustHeaderSize);
     }
 
-    //log-in panel
+    private void adjustHeaderSize() {
+        int frameHeight = getHeight();
+
+        // Scale logo and font
+        int newLogoSize = Math.max(60, (int)(frameHeight * 0.15));
+        int newFontSize = Math.max(18, (int)(frameHeight * 0.04));
+
+        if (originalLogoIcon != null) {
+            Image img = originalLogoIcon.getImage();
+            Image scaled = img.getScaledInstance(newLogoSize, newLogoSize, Image.SCALE_SMOOTH);
+            logoLabel.setIcon(new ImageIcon(scaled));
+            logoLabel.setText("");
+        }
+
+        Font currentFont = titleLabel.getFont();
+        titleLabel.setFont(currentFont.deriveFont(Font.BOLD, (float)newFontSize));
+
+        // Scale the gap spacer
+        int gapSize = Math.max(5, (int)(frameHeight * 0.02));
+        gapSpacer.setPreferredSize(new Dimension(1, gapSize));
+        gapSpacer.revalidate();
+
+        topPanel.revalidate();
+    }
+
     private JPanel createLoginPanel() {
-        // The White Card
         JPanel p = new JPanel(new GridLayout(0, 1, 10, 10));
         p.setBackground(Theme.CARD_BG);
         p.setBorder(BorderFactory.createCompoundBorder(
                 new LineBorder(Theme.BORDER, 1, true),
-                new EmptyBorder(30, 30, 30, 30) // More internal padding
+                new EmptyBorder(30, 30, 30, 30)
         ));
-        // Fixed size for the card look
         p.setPreferredSize(new Dimension(380, 380));
 
         JTextField userField = new JTextField();
@@ -237,10 +283,11 @@ class LoginFrame extends JFrame {
         JButton loginBtn = Theme.createButton("LOG IN", Theme.PRIMARY, Color.WHITE);
         JButton goToSignup = new JButton("No account? Sign Up");
         styleLinkButton(goToSignup);
-        //walay
+
         JButton forgotPasswordButton = new JButton("Forgot Password?");
         forgotPasswordButton.setHorizontalAlignment(SwingConstants.RIGHT);
         styleLinkButton(forgotPasswordButton);
+
         p.add(new JLabel("Username"));
         p.add(userField);
         p.add(new JLabel("Password"));
@@ -258,24 +305,23 @@ class LoginFrame extends JFrame {
 
         goToSignup.addActionListener(e -> cardLayout.show(cardPanel, "SIGNUP"));
 
-        // Wrapper with GridBagLayout for Centering
+        forgotPasswordButton.addActionListener(e -> cardLayout.show(cardPanel, "FORGOT_PASSWORD"));
+
         JPanel wrapper = new JPanel(new GridBagLayout());
         wrapper.setBackground(Theme.BACKGROUND);
         wrapper.add(p);
         return wrapper;
     }
 
-    //sign-up panel
     private JPanel createSignupPanel() {
-        // The White Card
         JPanel p = new JPanel(new GridLayout(0, 1, 10, 10));
         p.setBackground(Theme.CARD_BG);
         p.setBorder(BorderFactory.createCompoundBorder(
                 new LineBorder(Theme.BORDER, 1, true),
                 new EmptyBorder(30, 30, 30, 30)
         ));
-        // Taller fixed size for signup
-        p.setPreferredSize(new Dimension(380, 480));
+
+        p.setPreferredSize(new Dimension(380, 550));
 
         JButton signupBtn = Theme.createButton("CREATE ACCOUNT", Theme.SECONDARY, Color.WHITE);
         JButton goToLogin = new JButton("Back to Login");
@@ -283,10 +329,15 @@ class LoginFrame extends JFrame {
 
         p.add(new JLabel("New Username"));
         p.add(new JTextField());
+
+        p.add(new JLabel("Email"));
+        p.add(new JTextField());
+
         p.add(new JLabel("Password"));
         p.add(new JPasswordField());
         p.add(new JLabel("Confirm Password"));
         p.add(new JPasswordField());
+
         p.add(new JLabel(""));
         p.add(signupBtn);
         p.add(goToLogin);
@@ -298,7 +349,44 @@ class LoginFrame extends JFrame {
 
         goToLogin.addActionListener(e -> cardLayout.show(cardPanel, "LOGIN"));
 
-        // Wrapper with GridBagLayout for Centering
+
+        JPanel wrapper = new JPanel(new GridBagLayout());
+        wrapper.setBackground(Theme.BACKGROUND);
+        wrapper.add(p);
+        return wrapper;
+    }
+
+    private JPanel createForgotPasswordPanel() {
+        JPanel p = new JPanel(new GridLayout(0, 1, 10, 10));
+        p.setBackground(Theme.CARD_BG);
+        p.setBorder(BorderFactory.createCompoundBorder(
+                new LineBorder(Theme.BORDER, 1, true),
+                new EmptyBorder(30, 30, 30, 30)
+        ));
+        p.setPreferredSize(new Dimension(380, 450));
+
+        JButton changePassBtn = Theme.createButton("CHANGE PASSWORD", Theme.PRIMARY, Color.WHITE);
+        JButton backToLogin = new JButton("Back to Login");
+        styleLinkButton(backToLogin);
+
+        p.add(new JLabel("Enter Email"));
+        p.add(new JTextField());
+        p.add(new JLabel("New Password"));
+        p.add(new JPasswordField());
+        p.add(new JLabel("Confirm Password"));
+        p.add(new JPasswordField());
+
+        p.add(new JLabel(""));
+        p.add(changePassBtn);
+        p.add(backToLogin);
+
+        changePassBtn.addActionListener(e -> {
+            JOptionPane.showMessageDialog(this, "Password changed successfully!");
+            cardLayout.show(cardPanel, "LOGIN");
+        });
+
+        backToLogin.addActionListener(e -> cardLayout.show(cardPanel, "LOGIN"));
+
         JPanel wrapper = new JPanel(new GridBagLayout());
         wrapper.setBackground(Theme.BACKGROUND);
         wrapper.add(p);
@@ -314,7 +402,6 @@ class LoginFrame extends JFrame {
     }
 }
 
-// ------------------- MAIN APP FRAME -------------------
 class MainFrame extends JFrame {
     MockDataService dataService;
     JTabbedPane tabbedPane;
@@ -387,7 +474,6 @@ class MainFrame extends JFrame {
     }
 }
 
-// ------------------- POS PANEL -------------------
 class PosPanel extends JPanel {
     MainFrame frame;
     List<CartItem> cart = new ArrayList<>();
@@ -643,7 +729,6 @@ class PosPanel extends JPanel {
     }
 }
 
-// ------------------- INVENTORY PANEL -------------------
 class InventoryPanel extends JPanel {
     MainFrame frame;
     DefaultTableModel tableModel;
@@ -780,7 +865,6 @@ class InventoryPanel extends JPanel {
     }
 }
 
-// ------------------- CUSTOMER PANEL -------------------
 class CustomerPanel extends JPanel {
     MainFrame frame;
     DefaultTableModel tableModel;
@@ -851,7 +935,6 @@ class CustomerPanel extends JPanel {
     }
 }
 
-// ------------------- ANALYTICS PANEL -------------------
 class AnalyticsPanel extends JPanel {
     MainFrame frame;
     JLabel lblSales, lblTrans, lblAvg, lblItems;
@@ -965,7 +1048,6 @@ class AnalyticsPanel extends JPanel {
     }
 }
 
-// ------------------- HELPERS & CHARTS -------------------
 class SimpleBarChart extends JPanel {
     private Map<String, Double> data = new HashMap<>();
     public void setData(Map<String, Double> data) { this.data = new TreeMap<>(data); repaint(); }
@@ -1026,7 +1108,6 @@ class SimpleDocumentListener implements DocumentListener {
     public void changedUpdate(DocumentEvent e) { listener.update(e); }
 }
 
-//for edit icon
 class ActionButtonRenderer extends DefaultTableCellRenderer {
     private final JLabel iconLabel;
 
@@ -1065,7 +1146,6 @@ class EditIcon implements Icon {
         g2.setColor(color);
         g2.setStroke(new BasicStroke(1.5f));
 
-        // drawing the pencil
         g2.drawLine(x + 12, y + 2, x + 14, y + 4);
         g2.drawLine(x + 10, y + 4, x + 12, y + 6);
 
