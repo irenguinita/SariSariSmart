@@ -29,7 +29,7 @@ public class SariSariSmart2 {
     }
 }
 
-// ------------------- STYLINGS -------------------
+// stylingss
 class Theme {
     public static final Color BACKGROUND = new Color(245, 244, 235);
     public static final Color CARD_BG = Color.WHITE;
@@ -152,7 +152,7 @@ class MockDataService {
     public List<Transaction> getTransactions() { return transactions; }
 }
 
-// ------------------- FRAMES -------------------
+// log-in frames
 class LoginFrame extends JFrame {
     MockDataService dataService;
     JPanel cardPanel;
@@ -224,7 +224,7 @@ class LoginFrame extends JFrame {
         gbc.gridy = 1;
         gapSpacer = new JPanel();
         gapSpacer.setBackground(Theme.BACKGROUND);
-        // Default small spacer, updated in listener
+
         gapSpacer.setPreferredSize(new Dimension(1, 10));
         centralGroup.add(gapSpacer, gbc);
 
@@ -243,10 +243,10 @@ class LoginFrame extends JFrame {
         SwingUtilities.invokeLater(this::adjustHeaderSize);
     }
 
+    // TO FIX
     private void adjustHeaderSize() {
         int frameHeight = getHeight();
 
-        // Scale logo and font
         int newLogoSize = Math.max(60, (int)(frameHeight * 0.15));
         int newFontSize = Math.max(18, (int)(frameHeight * 0.04));
 
@@ -260,7 +260,6 @@ class LoginFrame extends JFrame {
         Font currentFont = titleLabel.getFont();
         titleLabel.setFont(currentFont.deriveFont(Font.BOLD, (float)newFontSize));
 
-        // Scale the gap spacer
         int gapSize = Math.max(5, (int)(frameHeight * 0.02));
         gapSpacer.setPreferredSize(new Dimension(1, gapSize));
         gapSpacer.revalidate();
@@ -268,6 +267,7 @@ class LoginFrame extends JFrame {
         topPanel.revalidate();
     }
 
+    //log-in panel
     private JPanel createLoginPanel() {
         JPanel p = new JPanel(new GridLayout(0, 1, 10, 10));
         p.setBackground(Theme.CARD_BG);
@@ -313,6 +313,7 @@ class LoginFrame extends JFrame {
         return wrapper;
     }
 
+    // sign-up panel
     private JPanel createSignupPanel() {
         JPanel p = new JPanel(new GridLayout(0, 1, 10, 10));
         p.setBackground(Theme.CARD_BG);
@@ -356,6 +357,7 @@ class LoginFrame extends JFrame {
         return wrapper;
     }
 
+    //forgot password panel
     private JPanel createForgotPasswordPanel() {
         JPanel p = new JPanel(new GridLayout(0, 1, 10, 10));
         p.setBackground(Theme.CARD_BG);
@@ -402,6 +404,7 @@ class LoginFrame extends JFrame {
     }
 }
 
+//main frame
 class MainFrame extends JFrame {
     MockDataService dataService;
     JTabbedPane tabbedPane;
@@ -474,6 +477,7 @@ class MainFrame extends JFrame {
     }
 }
 
+//pos panel
 class PosPanel extends JPanel {
     MainFrame frame;
     List<CartItem> cart = new ArrayList<>();
@@ -729,6 +733,7 @@ class PosPanel extends JPanel {
     }
 }
 
+//inventory panel
 class InventoryPanel extends JPanel {
     MainFrame frame;
     DefaultTableModel tableModel;
@@ -865,6 +870,7 @@ class InventoryPanel extends JPanel {
     }
 }
 
+//customer panel
 class CustomerPanel extends JPanel {
     MainFrame frame;
     DefaultTableModel tableModel;
@@ -935,6 +941,7 @@ class CustomerPanel extends JPanel {
     }
 }
 
+//analytics panel
 class AnalyticsPanel extends JPanel {
     MainFrame frame;
     JLabel lblSales, lblTrans, lblAvg, lblItems;
