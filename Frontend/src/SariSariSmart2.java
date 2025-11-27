@@ -328,13 +328,13 @@ class LoginFrame extends JFrame {
         JButton goToLogin = new JButton("Back to Login");
         styleLinkButton(goToLogin);
 
-        p.add(new JLabel("New Username"));
+        p.add(new JLabel("Enter Username"));
         p.add(new JTextField());
 
-        p.add(new JLabel("Email"));
+        p.add(new JLabel("Enter Email"));
         p.add(new JTextField());
 
-        p.add(new JLabel("Password"));
+        p.add(new JLabel("Enter Password"));
         p.add(new JPasswordField());
         p.add(new JLabel("Confirm Password"));
         p.add(new JPasswordField());
