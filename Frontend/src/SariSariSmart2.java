@@ -1,5 +1,3 @@
-//package Capstone2;
-
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.DocumentEvent;
@@ -30,7 +28,8 @@ public class SariSariSmart2 {
         });
     }
 }
-// stylings
+
+// ------------------- STYLINGS -------------------
 class Theme {
     public static final Color BACKGROUND = new Color(245, 244, 235);
     public static final Color CARD_BG = Color.WHITE;
@@ -129,7 +128,12 @@ class Theme {
     }
 }
 
-// mock data service class (this is a prototype ra so that those who are assigned for the backend get the idea)
+
+
+
+
+
+// ------------------- MOCK SERVICE -------------------
 class MockDataService {
     private List<Product> products = new ArrayList<>();
     private List<Customer> customers = new ArrayList<>();
@@ -155,7 +159,7 @@ class MockDataService {
     public List<Transaction> getTransactions() { return transactions; }
 }
 
-// log-in frame
+// ------------------- LOG IN FRAME (CENTERED) -------------------
 class LoginFrame extends JFrame {
     MockDataService dataService;
     JPanel cardPanel;
@@ -164,20 +168,22 @@ class LoginFrame extends JFrame {
     public LoginFrame(MockDataService dataService) {
         this.dataService = dataService;
         setTitle("Sari-Sari Smart");
-        setSize(450, 750);
+        setSize(1200, 800);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
-        setResizable(false);
+        setResizable(true);
 
         JPanel mainContainer = new JPanel();
         mainContainer.setBackground(Theme.BACKGROUND);
         mainContainer.setLayout(new BorderLayout());
         setContentPane(mainContainer);
 
+        // --- Header Section ---
         JPanel topPanel = new JPanel();
         topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
         topPanel.setBackground(Theme.BACKGROUND);
-        topPanel.setBorder(BorderFactory.createEmptyBorder(50, 0, 30, 0));
+        // Reduced bottom padding so centered card looks better
+        topPanel.setBorder(BorderFactory.createEmptyBorder(40, 0, 10, 0));
 
         JLabel logoLabel = new JLabel();
         logoLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -200,10 +206,12 @@ class LoginFrame extends JFrame {
         topPanel.add(titleLabel);
         mainContainer.add(topPanel, BorderLayout.NORTH);
 
+        // --- Card Area (Center) ---
         cardLayout = new CardLayout();
         cardPanel = new JPanel(cardLayout);
         cardPanel.setBackground(Theme.BACKGROUND);
-        cardPanel.setBorder(BorderFactory.createEmptyBorder(0, 40, 40, 40));
+        // We remove large border padding here to let GridBag center freely
+        cardPanel.setBorder(null);
 
         cardPanel.add(createLoginPanel(), "LOGIN");
         cardPanel.add(createSignupPanel(), "SIGNUP");
@@ -213,12 +221,15 @@ class LoginFrame extends JFrame {
 
     //log-in panel
     private JPanel createLoginPanel() {
+        // The White Card
         JPanel p = new JPanel(new GridLayout(0, 1, 10, 10));
         p.setBackground(Theme.CARD_BG);
         p.setBorder(BorderFactory.createCompoundBorder(
                 new LineBorder(Theme.BORDER, 1, true),
-                new EmptyBorder(20, 20, 20, 20)
+                new EmptyBorder(30, 30, 30, 30) // More internal padding
         ));
+        // Fixed size for the card look
+        p.setPreferredSize(new Dimension(380, 380));
 
         JTextField userField = new JTextField();
         JPasswordField passField = new JPasswordField();
@@ -247,20 +258,24 @@ class LoginFrame extends JFrame {
 
         goToSignup.addActionListener(e -> cardLayout.show(cardPanel, "SIGNUP"));
 
-        JPanel wrapper = new JPanel(new BorderLayout());
+        // Wrapper with GridBagLayout for Centering
+        JPanel wrapper = new JPanel(new GridBagLayout());
         wrapper.setBackground(Theme.BACKGROUND);
-        wrapper.add(p, BorderLayout.NORTH);
+        wrapper.add(p);
         return wrapper;
     }
 
     //sign-up panel
     private JPanel createSignupPanel() {
+        // The White Card
         JPanel p = new JPanel(new GridLayout(0, 1, 10, 10));
         p.setBackground(Theme.CARD_BG);
         p.setBorder(BorderFactory.createCompoundBorder(
                 new LineBorder(Theme.BORDER, 1, true),
-                new EmptyBorder(20, 20, 20, 20)
+                new EmptyBorder(30, 30, 30, 30)
         ));
+        // Taller fixed size for signup
+        p.setPreferredSize(new Dimension(380, 480));
 
         JButton signupBtn = Theme.createButton("CREATE ACCOUNT", Theme.SECONDARY, Color.WHITE);
         JButton goToLogin = new JButton("Back to Login");
@@ -283,9 +298,10 @@ class LoginFrame extends JFrame {
 
         goToLogin.addActionListener(e -> cardLayout.show(cardPanel, "LOGIN"));
 
-        JPanel wrapper = new JPanel(new BorderLayout());
+        // Wrapper with GridBagLayout for Centering
+        JPanel wrapper = new JPanel(new GridBagLayout());
         wrapper.setBackground(Theme.BACKGROUND);
-        wrapper.add(p, BorderLayout.NORTH);
+        wrapper.add(p);
         return wrapper;
     }
 
@@ -298,6 +314,7 @@ class LoginFrame extends JFrame {
     }
 }
 
+// ------------------- MAIN APP FRAME -------------------
 class MainFrame extends JFrame {
     MockDataService dataService;
     JTabbedPane tabbedPane;
@@ -370,6 +387,7 @@ class MainFrame extends JFrame {
     }
 }
 
+// ------------------- POS PANEL -------------------
 class PosPanel extends JPanel {
     MainFrame frame;
     List<CartItem> cart = new ArrayList<>();
@@ -625,7 +643,7 @@ class PosPanel extends JPanel {
     }
 }
 
-// Inventory Panel
+// ------------------- INVENTORY PANEL -------------------
 class InventoryPanel extends JPanel {
     MainFrame frame;
     DefaultTableModel tableModel;
@@ -762,6 +780,7 @@ class InventoryPanel extends JPanel {
     }
 }
 
+// ------------------- CUSTOMER PANEL -------------------
 class CustomerPanel extends JPanel {
     MainFrame frame;
     DefaultTableModel tableModel;
@@ -832,6 +851,7 @@ class CustomerPanel extends JPanel {
     }
 }
 
+// ------------------- ANALYTICS PANEL -------------------
 class AnalyticsPanel extends JPanel {
     MainFrame frame;
     JLabel lblSales, lblTrans, lblAvg, lblItems;
@@ -945,7 +965,7 @@ class AnalyticsPanel extends JPanel {
     }
 }
 
-// charts and som helpers
+// ------------------- HELPERS & CHARTS -------------------
 class SimpleBarChart extends JPanel {
     private Map<String, Double> data = new HashMap<>();
     public void setData(Map<String, Double> data) { this.data = new TreeMap<>(data); repaint(); }
