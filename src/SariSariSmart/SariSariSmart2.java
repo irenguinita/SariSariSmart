@@ -23,8 +23,7 @@ import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class SariSariSmart2 {
-    private static UserManager userManager;
+public class SariSariSmart2 {;
 
     public static void main(String[] args) {
         File dataDirectory = new File("data");
@@ -353,19 +352,28 @@ class LoginFrame extends JFrame {
                 // status label here
                 throw new LoginFailedException("Field is empty");
             }
+            if (!user.contains(" ") && user.length() >= 6) {
+                try {
+                    User loggedInUser = userManager.login(user, pass);
 
-            try {
-                User loggedInUser = userManager.login(user, pass);
+                    if (loggedInUser != null) {
+                        userField.setText("");
+                        passField.setText("");
 
-                if (loggedInUser != null){
-                    userField.setText("");
-                    passField.setText("");
-
-                    this.dispose();
-                    new MainFrame(dataService).setVisible(true);
+                        this.dispose();
+                        new MainFrame(dataService).setVisible(true);
+                    }
+                } catch (LoginFailedException l) {
+                    // status label
                 }
-            } catch (LoginFailedException l){
-                // status label
+            } else {
+                if (user.contains(" ")){
+                    // status label here
+                    throw new SignUpFailedException("Must not include space.");
+                } else if (user.length() < 6){
+                    // status label here
+                    throw new SignUpFailedException("User must have at least 6 characters");
+                }
             }
         });
 
@@ -414,24 +422,33 @@ class LoginFrame extends JFrame {
                 throw new SignUpFailedException("Passwords does not match.");
             }
 
-            try {
-                userManager.registerUser(user, pass);
+            if (!user.contains(" ") && user.length() >= 6){
+                try {
+                    userManager.registerUser(user, pass);
 
-                userField.setText("");
-                passField.setText("");
-                confirmPassField.setText("");
+                    userField.setText("");
+                    passField.setText("");
+                    confirmPassField.setText("");
 
-                JOptionPane.showMessageDialog(this, "Account Created (No DB)");
-                cardLayout.show(cardPanel, "LOGIN");
+                    JOptionPane.showMessageDialog(this, "Account Created (No DB)");
+                    cardLayout.show(cardPanel, "LOGIN");
 
-            } catch (DuplicateUserException ex) {
-                // status label here
-                System.err.println("ERROR: User already exist. " + ex.getMessage());
-            } catch (SignUpFailedException ex) {
-                // status label here
-                System.err.println("ERROR: Passwords does not match. " + ex.getMessage());
-            } catch (IOException ex) {
-                System.err.println("ERROR: Could not create an account. " + ex.getMessage());
+                } catch (DuplicateUserException ex) {
+                    // status label here
+                    System.err.println("ERROR: User already exist. " + ex.getMessage());
+                } catch (SignUpFailedException ex) {
+                    // status label here
+                    System.err.println("ERROR: Passwords does not match. " + ex.getMessage());
+                } catch (IOException ex) {
+                    System.err.println("ERROR: Could not create an account. " + ex.getMessage());
+                }
+            } else {
+                if (user.contains(" ")){
+                    // status label here
+                    throw new SignUpFailedException("Must not include space.");
+                } else if (user.length() < 6){
+                    throw new SignUpFailedException("User must have at least 6 characters");
+                }
             }
         });
 
