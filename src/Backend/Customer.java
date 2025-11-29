@@ -1,9 +1,9 @@
 package Backend;
 
-class Customer {
-    String id, customId, name, phone;
-    int loyaltyPoints;
-    double totalPurchases;
+public class Customer {
+    public String id, customId, name, phone;
+    public int loyaltyPoints;
+    public double totalPurchases;
 
     public Customer(String id, String customId, String name, String phone, int loyaltyPoints, double totalPurchases) {
         this.id = id;

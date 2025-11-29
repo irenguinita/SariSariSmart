@@ -1,9 +1,9 @@
 package Backend;
 
-class CartItem {
-    Product product;
-    int quantity;
-    double unitPrice;
+public class CartItem {
+    public Product product;
+    public int quantity;
+    public double unitPrice;
 
     public CartItem(Product product, int quantity) {
         this.product = product;

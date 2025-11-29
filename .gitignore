@@ -1,7 +1,21 @@
-# IntelliJ build output
-/out/
-
-# IntelliJ project files
+# --- IntelliJ IDE ---
 .idea/
 *.iml
+*.iws
+/out/
 
+# --- Java Compiled Files ---
+*.class
+*.jar
+
+# --- OS System Files (Keep repo clean) ---
+Thumbs.db
+.DS_Store
+
+# --- App Specific ---
+# Ignore the activity log (so your local history doesn't overwrite others)
+#comment out this line if want to save logs in github
+data/User/log.txt
+
+# (Optional) If you DO NOT want to share your user database, uncomment the line below:
+# data/User/users.csv

@@ -1,4 +1,4 @@
-package Database.Users.CustomException;
+package Database.CustomException;
 
 public class LoginFailedException extends RuntimeException {
     public LoginFailedException(String message) {
