@@ -1,3 +1,5 @@
+package Backend;
+
 class CartItem {
     Product product;
     int quantity;

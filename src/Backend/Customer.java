@@ -1,3 +1,5 @@
+package Backend;
+
 class Customer {
     String id, customId, name, phone;
     int loyaltyPoints;

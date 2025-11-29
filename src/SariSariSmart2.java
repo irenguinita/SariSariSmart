@@ -288,7 +288,7 @@ class LoginFrame extends JFrame {
         JLabel logoLabel = new JLabel();
         logoLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         try {
-            ImageIcon logoIcon = new ImageIcon(getClass().getResource("/SariSariSmart_Logo.png"));
+            ImageIcon logoIcon = new ImageIcon(Objects.requireNonNull(getClass().getResource("/SariSariSmart_Logo.png")));
             Image scaledIcon = logoIcon.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
             logoLabel.setIcon(new ImageIcon(scaledIcon));
         } catch (Exception e) {
@@ -507,7 +507,7 @@ class MainFrame extends JFrame {
         logo.setFont(Theme.FONT_HEADER);
         logo.setForeground(Theme.PRIMARY);
         try {
-            ImageIcon logoIcon = new ImageIcon(getClass().getResource("/SariSariSmart_Logo.png"));
+            ImageIcon logoIcon = new ImageIcon(getClass().getResource("/SariSariSmart/SariSariSmart_Logo.png"));
             Image scaledIcon = logoIcon.getImage().getScaledInstance(60, 60, Image.SCALE_SMOOTH);
             logo.setIcon(new ImageIcon(scaledIcon));
         } catch (Exception e) {}

@@ -1,3 +1,5 @@
+package Backend;
+
 // product class
 class Product {
     String id, sku, name, category, description;
