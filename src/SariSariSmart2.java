@@ -416,24 +416,68 @@ class LoginFrame extends JFrame {
         JButton goToLogin = new JButton("Back to Login");
         styleLinkButton(goToLogin);
 
+        JTextField userField = new JTextField();
+        JPasswordField passField = new JPasswordField();
+        JPasswordField confirmPassField = new JPasswordField();
+
         p.add(new JLabel("Enter Username"));
-        p.add(new JTextField());
+        p.add(userField);
 
         p.add(new JLabel("Enter Email"));
         p.add(new JTextField());
 
         p.add(new JLabel("Enter Password"));
-        p.add(new JPasswordField());
+        p.add(passField);
         p.add(new JLabel("Confirm Password"));
-        p.add(new JPasswordField());
+        p.add(confirmPassField);
 
-        p.add(new JLabel(""));
+        JLabel statusLabel = new JLabel("");
+        p.add(statusLabel);
         p.add(signupBtn);
         p.add(goToLogin);
 
         signupBtn.addActionListener(e -> {
-            JOptionPane.showMessageDialog(this, "Account Created (No DB)");
-            cardLayout.show(cardPanel, "LOGIN");
+            String user = userField.getText().trim();
+            String pass = new String(passField.getPassword()).trim();
+            String confirmPass = new String(confirmPassField.getPassword()).trim();
+
+            if (!pass.equals(confirmPass)){
+                // status label here
+                statusLabel.setText("Passwords do not match.");
+                throw new SignUpFailedException("Passwords does not match.");
+            }
+
+            if (!user.contains(" ") && user.length() >= 6){
+                try {
+                    userManager.registerUser(user, pass);
+
+                    userField.setText("");
+                    passField.setText("");
+                    confirmPassField.setText("");
+
+                    JOptionPane.showMessageDialog(this, "Account Created (No DB)");
+                    cardLayout.show(cardPanel, "LOGIN");
+
+                } catch (DuplicateUserException ex) {
+                    // status label here
+                    statusLabel.setText("User already exists.");
+                    System.err.println("ERROR: User already exist. " + ex.getMessage());
+                } catch (SignUpFailedException ex) {
+                    // status label here
+                    System.err.println("ERROR: Passwords does not match. " + ex.getMessage());
+                } catch (IOException ex) {
+                    System.err.println("ERROR: Could not create an account. " + ex.getMessage());
+                }
+            } else {
+                if (user.contains(" ")){
+                    // status label here
+                    statusLabel.setText("Username must not include space.");
+                    throw new SignUpFailedException("Must not include space.");
+                } else if (user.length() < 6){
+                    statusLabel.setText("Username must have at least 6 characters.");
+                    throw new SignUpFailedException("User must have at least 6 characters");
+                }
+            }
         });
 
         goToLogin.addActionListener(e -> cardLayout.show(cardPanel, "LOGIN"));
