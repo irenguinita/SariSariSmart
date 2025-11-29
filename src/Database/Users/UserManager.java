@@ -11,8 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UserManager {
-    private static final String DATA_FILE_CSV = "data/users.csv";
-    private static final String LOG_FILE_TXT = "data/log.txt";
+    private static final String DATA_FILE_CSV = "data/User/users.csv";
+    private static final String LOG_FILE_TXT = "data/User/log.txt";
     private final List<User> userList;
 
     public UserManager(){
@@ -24,6 +24,20 @@ public class UserManager {
             logAction("User data file not found.");
         } catch (IOException e){
             System.err.println("ERROR: Could not load user data. " + e.getMessage());
+        }
+    }
+
+    public void userFolder(){
+        File dataDirectory = new File("data/User");
+        if (!dataDirectory.exists()){
+            boolean created = dataDirectory.mkdirs();
+            if (created){
+                System.out.println("Created data directory: " + dataDirectory.getAbsolutePath());
+            } else {
+                System.err.println("ERROR: Could not create directory");
+            }
+        } else {
+            System.err.println("Folder already existed.");
         }
     }
 
@@ -104,7 +118,7 @@ public class UserManager {
             return authenticatedUser;
         } else {
             logAction("Failed to login: " + username);
-            throw new LoginFailedException("User not found");
+            return null;
         }
     }
 

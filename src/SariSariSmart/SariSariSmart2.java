@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 public class SariSariSmart2 {;
 
     public static void main(String[] args) {
+
         File dataDirectory = new File("data");
         if (!dataDirectory.exists()){
             boolean created = dataDirectory.mkdirs();
@@ -38,7 +39,6 @@ public class SariSariSmart2 {;
             System.err.println("Folder already existed.");
         }
 
-
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e) {
@@ -50,6 +50,8 @@ public class SariSariSmart2 {;
                 UserManager userManager = new UserManager();
                 MockDataService dataService = new MockDataService();
                 new LoginFrame(dataService, userManager).setVisible(true);
+
+                userManager.userFolder();
             } catch (Exception e){
                 System.exit(1);
             }
@@ -330,6 +332,7 @@ class LoginFrame extends JFrame {
         JButton loginBtn = Theme.createButton("LOG IN", Theme.PRIMARY, Color.WHITE);
         JButton goToSignup = new JButton("No account? Sign Up");
         styleLinkButton(goToSignup);
+
         //walay
         JButton forgotPasswordButton = new JButton("Forgot Password?");
         forgotPasswordButton.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -352,6 +355,7 @@ class LoginFrame extends JFrame {
                 // status label here
                 throw new LoginFailedException("Field is empty");
             }
+
             if (!user.contains(" ") && user.length() >= 6) {
                 try {
                     User loggedInUser = userManager.login(user, pass);
@@ -362,6 +366,15 @@ class LoginFrame extends JFrame {
 
                         this.dispose();
                         new MainFrame(dataService).setVisible(true);
+                    }
+                    else {
+                        try {
+                            userField.setText("");
+                            passField.setText("");
+                        } catch (LoginFailedException l) {
+                            // status label
+                            System.err.println("ERROR: User not found. Try again. " + l.getMessage());
+                        }
                     }
                 } catch (LoginFailedException l) {
                     // status label
