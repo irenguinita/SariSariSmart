@@ -7,12 +7,12 @@ import Database.Users.UserManager;
 
 import javax.swing.*;
 import javax.swing.border.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
+import javax.swing.event.*;
+import javax.swing.table.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.geom.*;
+import java.text.*;
 import java.awt.geom.Arc2D;
 import java.awt.geom.Path2D;
 import java.io.File;
@@ -20,9 +20,9 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.stream.*;
 
-public class SariSariSmart2 {;
+public class SariSariSmart2 {
 
     public static void main(String[] args) {
 
@@ -57,12 +57,7 @@ public class SariSariSmart2 {;
         });
     }
 }
-//test change'-
-// test 2
-//test 3 push
-// lololo
-//testing testing
-// stylings
+
 class Theme {
     public static final Color BACKGROUND = new Color(245, 244, 235);
     public static final Color CARD_BG = Color.WHITE;
@@ -269,61 +264,83 @@ class LoginFrame extends JFrame {
         this.dataService = dataService;
         this.userManager = userManager;
         setTitle("Sari-Sari Smart");
-        setSize(450, 750);
+        setSize(1200, 800);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
-        setResizable(false);
-
-        JPanel mainContainer = new JPanel();
-        mainContainer.setBackground(Theme.BACKGROUND);
-        mainContainer.setLayout(new BorderLayout());
-        setContentPane(mainContainer);
-
-        JPanel topPanel = new JPanel();
-        topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
-        topPanel.setBackground(Theme.BACKGROUND);
-        topPanel.setBorder(BorderFactory.createEmptyBorder(50, 0, 30, 0));
-
-        JLabel logoLabel = new JLabel();
-        logoLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        try {
-            ImageIcon logoIcon = new ImageIcon(Objects.requireNonNull(getClass().getResource("/SariSariSmart_Logo.png")));
-            Image scaledIcon = logoIcon.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
-            logoLabel.setIcon(new ImageIcon(scaledIcon));
-        } catch (Exception e) {
-            logoLabel.setText("[LOGO]");
-        }
-        logoLabel.setFont(Theme.FONT_HEADER);
-
-        JLabel titleLabel = new JLabel("Sari-Sari Smart");
-        titleLabel.setFont(Theme.FONT_HEADER);
-        titleLabel.setForeground(Theme.PRIMARY);
-        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        titleLabel.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
-
-        topPanel.add(logoLabel);
-        topPanel.add(titleLabel);
-        mainContainer.add(topPanel, BorderLayout.NORTH);
+        setResizable(true);
 
         cardLayout = new CardLayout();
         cardPanel = new JPanel(cardLayout);
         cardPanel.setBackground(Theme.BACKGROUND);
-        cardPanel.setBorder(BorderFactory.createEmptyBorder(0, 40, 40, 40));
 
-        cardPanel.add(createLoginPanel(), "LOGIN");
-        cardPanel.add(createSignupPanel(), "SIGNUP");
+        cardPanel.add(createPanelWrapper(createLoginBox(), "LOGIN"), "LOGIN");
+        cardPanel.add(createPanelWrapper(createSignupBox(), "SIGNUP"), "SIGNUP");
+        cardPanel.add(createPanelWrapper(createForgotBox(), "FORGOT_PASSWORD"), "FORGOT_PASSWORD");
 
-        mainContainer.add(cardPanel, BorderLayout.CENTER);
+        add(cardPanel);
     }
 
-    //log-in panel
-    private JPanel createLoginPanel() {
+    //PANELS
+    //wrapper for the logo, text and the panel para maka adjust and space between the header and the panels
+    JPanel createPanelWrapper(JPanel formBox, String type) {
+        JPanel wrapper = new JPanel(new GridBagLayout());
+        wrapper.setBackground(Theme.BACKGROUND);
+
+        JPanel contentStack = new JPanel();
+        contentStack.setLayout(new BoxLayout(contentStack, BoxLayout.Y_AXIS));
+        contentStack.setBackground(Theme.BACKGROUND);
+
+        JPanel header = createHeader();
+        contentStack.add(header);
+
+        contentStack.add(Box.createVerticalStrut(20));
+
+        contentStack.add(formBox);
+
+        wrapper.add(contentStack);
+        return wrapper;
+    }
+
+    JPanel createHeader() {
+        JPanel header = new JPanel();
+        header.setLayout(new BoxLayout(header, BoxLayout.Y_AXIS));
+        header.setBackground(Theme.BACKGROUND);
+        header.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JLabel logoLabel = new JLabel();
+        logoLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+
+        try {
+            ImageIcon originalIcon = new ImageIcon(getClass().getResource("/SariSariSmart_Logo.png"));
+            Image scaled = originalIcon.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
+            logoLabel.setIcon(new ImageIcon(scaled));
+        } catch (Exception e) {
+            logoLabel.setText("[LOGO]");
+            logoLabel.setFont(Theme.FONT_HEADER);
+        }
+
+        JLabel titleLabel = new JLabel("Sari-Sari Smart");
+        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 32));
+        titleLabel.setForeground(Theme.PRIMARY);
+        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        titleLabel.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
+
+        header.add(logoLabel);
+        header.add(titleLabel);
+
+        return header;
+    }
+
+    JPanel createLoginBox() {
         JPanel p = new JPanel(new GridLayout(0, 1, 10, 10));
         p.setBackground(Theme.CARD_BG);
         p.setBorder(BorderFactory.createCompoundBorder(
                 new LineBorder(Theme.BORDER, 1, true),
-                new EmptyBorder(20, 20, 20, 20)
+                new EmptyBorder(30, 30, 30, 30)
         ));
+        p.setPreferredSize(new Dimension(380, 350));
+        p.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         JTextField userField = new JTextField();
         JPasswordField passField = new JPasswordField();
@@ -332,10 +349,10 @@ class LoginFrame extends JFrame {
         JButton goToSignup = new JButton("No account? Sign Up");
         styleLinkButton(goToSignup);
 
-        //walay
         JButton forgotPasswordButton = new JButton("Forgot Password?");
         forgotPasswordButton.setHorizontalAlignment(SwingConstants.RIGHT);
         styleLinkButton(forgotPasswordButton);
+
         p.add(new JLabel("Username"));
         p.add(userField);
         p.add(new JLabel("Password"));
@@ -380,89 +397,84 @@ class LoginFrame extends JFrame {
         });
 
         goToSignup.addActionListener(e -> cardLayout.show(cardPanel, "SIGNUP"));
+        forgotPasswordButton.addActionListener(e -> cardLayout.show(cardPanel, "FORGOT_PASSWORD"));
 
-        JPanel wrapper = new JPanel(new BorderLayout());
-        wrapper.setBackground(Theme.BACKGROUND);
-        wrapper.add(p, BorderLayout.NORTH);
-        return wrapper;
+        return p;
     }
 
-    //sign-up panel
-    private JPanel createSignupPanel() {
+    private JPanel createSignupBox() {
         JPanel p = new JPanel(new GridLayout(0, 1, 10, 10));
         p.setBackground(Theme.CARD_BG);
         p.setBorder(BorderFactory.createCompoundBorder(
                 new LineBorder(Theme.BORDER, 1, true),
-                new EmptyBorder(20, 20, 20, 20)
+                new EmptyBorder(30, 30, 30, 30)
         ));
+        p.setPreferredSize(new Dimension(380, 520));
+        p.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         JButton signupBtn = Theme.createButton("CREATE ACCOUNT", Theme.SECONDARY, Color.WHITE);
         JButton goToLogin = new JButton("Back to Login");
         styleLinkButton(goToLogin);
 
-        JTextField userField = new JTextField();
-        JPasswordField passField = new JPasswordField();
-        JPasswordField confirmPassField = new JPasswordField();
+        p.add(new JLabel("Enter Username"));
+        p.add(new JTextField());
 
-        p.add(new JLabel("New Username"));
-        p.add(userField);
-        p.add(new JLabel("Password"));
-        p.add(passField);
+        p.add(new JLabel("Enter Email"));
+        p.add(new JTextField());
+
+        p.add(new JLabel("Enter Password"));
+        p.add(new JPasswordField());
         p.add(new JLabel("Confirm Password"));
-        p.add(confirmPassField);
+        p.add(new JPasswordField());
+
         p.add(new JLabel(""));
         p.add(signupBtn);
         p.add(goToLogin);
 
         signupBtn.addActionListener(e -> {
-            String user = userField.getText().trim();
-            String pass = new String(passField.getPassword()).trim();
-            String confirmPass = new String(confirmPassField.getPassword()).trim();
-
-            if (!pass.equals(confirmPass)){
-                // status label here
-                throw new SignUpFailedException("Passwords does not match.");
-            }
-
-            if (!user.contains(" ") && user.length() >= 6){
-                try {
-                    userManager.registerUser(user, pass);
-
-                    userField.setText("");
-                    passField.setText("");
-                    confirmPassField.setText("");
-
-                    JOptionPane.showMessageDialog(this, "Account Created (No DB)");
-                    cardLayout.show(cardPanel, "LOGIN");
-
-                } catch (DuplicateUserException ex) {
-                    // status label here
-                    System.err.println("ERROR: User already exist. " + ex.getMessage());
-                } catch (SignUpFailedException ex) {
-                    // status label here
-                    System.err.println("ERROR: Passwords does not match. " + ex.getMessage());
-                } catch (IOException ex) {
-                    System.err.println("ERROR: Could not create an account. " + ex.getMessage());
-                }
-            } else {
-                if (user.contains(" ")){
-                    // status label here
-                    throw new SignUpFailedException("Must not include space.");
-                } else if (user.length() < 6){
-                    throw new SignUpFailedException("User must have at least 6 characters");
-                }
-            }
+            JOptionPane.showMessageDialog(this, "Account Created (No DB)");
+            cardLayout.show(cardPanel, "LOGIN");
         });
 
         goToLogin.addActionListener(e -> cardLayout.show(cardPanel, "LOGIN"));
-
-        JPanel wrapper = new JPanel(new BorderLayout());
-        wrapper.setBackground(Theme.BACKGROUND);
-        wrapper.add(p, BorderLayout.NORTH);
-        return wrapper;
+        return p;
     }
 
-    private void styleLinkButton(JButton btn) {
+    private JPanel createForgotBox() {
+        JPanel p = new JPanel(new GridLayout(0, 1, 10, 10));
+        p.setBackground(Theme.CARD_BG);
+        p.setBorder(BorderFactory.createCompoundBorder(
+                new LineBorder(Theme.BORDER, 1, true),
+                new EmptyBorder(30, 30, 30, 30)
+        ));
+        p.setPreferredSize(new Dimension(380, 420));
+        p.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JButton changePassBtn = Theme.createButton("CHANGE PASSWORD", Theme.PRIMARY, Color.WHITE);
+        JButton backToLogin = new JButton("Back to Login");
+        styleLinkButton(backToLogin);
+
+        p.add(new JLabel("Enter Email"));
+        p.add(new JTextField());
+        p.add(new JLabel("New Password"));
+        p.add(new JPasswordField());
+        p.add(new JLabel("Confirm Password"));
+        p.add(new JPasswordField());
+
+        p.add(new JLabel(""));
+        p.add(changePassBtn);
+        p.add(backToLogin);
+
+        changePassBtn.addActionListener(e -> {
+            JOptionPane.showMessageDialog(this, "Password changed successfully!");
+            cardLayout.show(cardPanel, "LOGIN");
+        });
+
+        backToLogin.addActionListener(e -> cardLayout.show(cardPanel, "LOGIN"));
+        return p;
+    }
+
+    void styleLinkButton(JButton btn) {
         btn.setBorderPainted(false);
         btn.setFocusPainted(false);
         btn.setContentAreaFilled(false);
@@ -471,6 +483,7 @@ class LoginFrame extends JFrame {
     }
 }
 
+//main frame
 class MainFrame extends JFrame {
     MockDataService dataService;
     JTabbedPane tabbedPane;
@@ -496,7 +509,7 @@ class MainFrame extends JFrame {
         logo.setFont(Theme.FONT_HEADER);
         logo.setForeground(Theme.PRIMARY);
         try {
-            ImageIcon logoIcon = new ImageIcon(getClass().getResource("/SariSariSmart/SariSariSmart_Logo.png"));
+            ImageIcon logoIcon = new ImageIcon(getClass().getResource("/SariSariSmart_Logo.png"));
             Image scaledIcon = logoIcon.getImage().getScaledInstance(60, 60, Image.SCALE_SMOOTH);
             logo.setIcon(new ImageIcon(scaledIcon));
         } catch (Exception e) {}
@@ -827,6 +840,8 @@ class InventoryPanel extends JPanel {
         JTable table = new JTable(tableModel);
         Theme.styleTable(table);
 
+        table.getTableHeader().setReorderingAllowed(false);
+
         table.getColumnModel().getColumn(6).setMaxWidth(80);
         table.getColumnModel().getColumn(6).setCellRenderer(new ActionButtonRenderer());
 
@@ -962,6 +977,8 @@ class CustomerPanel extends JPanel {
         };
         JTable table = new JTable(tableModel);
         Theme.styleTable(table);
+
+        table.getTableHeader().setReorderingAllowed(false);
 
 
         JScrollPane scrollPane = new JScrollPane(table);
