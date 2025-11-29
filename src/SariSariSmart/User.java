@@ -1,4 +1,4 @@
-package Database.Users;
+package SariSariSmart;
 
 public class User {
     private String username;

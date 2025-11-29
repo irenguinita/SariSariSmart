@@ -1,4 +1,4 @@
-package Database.Users.CustomException;
+package Database.CustomException;
 
 public class SignUpFailedException extends RuntimeException {
     public SignUpFailedException(String message) {

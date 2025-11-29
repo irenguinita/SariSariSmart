@@ -1,9 +1,10 @@
 package SariSariSmart;
 
-import Database.Users.CustomException.DuplicateUserException;
-import Database.Users.CustomException.LoginFailedException;
-import Database.Users.CustomException.SignUpFailedException;
-import Database.Users.User;
+import Database.CustomException.InvalidInputException;
+import Database.Inventory.InventoryManager;
+import Database.CustomException.DuplicateUserException;
+import Database.CustomException.LoginFailedException;
+import Database.CustomException.SignUpFailedException;
 import Database.Users.UserManager;
 
 import javax.swing.*;
@@ -48,11 +49,17 @@ public class SariSariSmart2 {;
         SwingUtilities.invokeLater(() -> {
             try {
                 UserManager userManager = new UserManager();
-                MockDataService dataService = new MockDataService();
-                new LoginFrame(dataService, userManager).setVisible(true);
+                InventoryManager inventoryManager = new InventoryManager();
 
                 userManager.userFolder();
+                inventoryManager.inventoryFolder();
+
+                DataService dataService = new DataService();
+                new LoginFrame(dataService, userManager).setVisible(true);
+
+
             } catch (Exception e){
+                System.err.println("Application failed to launch.");
                 System.exit(1);
             }
         });
@@ -162,32 +169,6 @@ class Theme {
     }
 }
 
-// product class
-class Product {
-    String id, sku, name, category, description;
-    double price;
-    int stock, reorderPoint;
-
-    public Product(String id, String sku, String name, double price, int stock, String category, int reorderPoint, String description) {
-        this.id = id; this.sku = sku; this.name = name; this.price = price;
-        this.stock = stock; this.category = category; this.reorderPoint = reorderPoint; this.description = description;
-    }
-
-    public static String generateSKU() {
-        return "PROD-" + (int)(Math.random() * 10000);
-    }
-
-    public boolean isLowStock(){
-        return stock <= reorderPoint;
-    }
-    public void adjustStock(int qty){
-        this.stock += qty;
-    }
-    public String toString(){
-        return name;
-    }
-}
-
 class Customer {
     String id, customId, name, phone;
     int loyaltyPoints;
@@ -234,22 +215,23 @@ class Transaction {
 }
 
 // mock data service class (this is a prototype ra so that those who are assigned for the backend get the idea)
-class MockDataService {
-    private List<Product> products = new ArrayList<>();
-    private List<Customer> customers = new ArrayList<>();
-    private List<Transaction> transactions = new ArrayList<>();
+// changes DataService - DataService
+class DataService {
+    private final List<Product> products;
+    private final List<Customer> customers = new ArrayList<>();
+    private final List<Transaction> transactions = new ArrayList<>();
+    private final InventoryManager inventoryManager = new InventoryManager();
 
-    public MockDataService() {
+    public DataService() throws IOException {
+        this.products = inventoryManager.getInventoryList();
         populateDummyData();
     }
 
-    private void populateDummyData() {
-        products.add(new Product("1", "SKU-101", "Canned Tuna", 25.00, 50, "Canned Goods", 10, ""));
-        products.add(new Product("2", "SKU-102", "Instant Noodles", 12.50, 100, "Canned Goods", 20, ""));
-        products.add(new Product("3", "SKU-201", "Soda 1.5L", 65.00, 20, "Beverages", 5, ""));
-        products.add(new Product("4", "SKU-202", "Energy Drink", 35.00, 5, "Beverages", 10, ""));
-        products.add(new Product("5", "SKU-301", "Laundry Soap", 8.00, 200, "Household", 50, ""));
+    public InventoryManager getInventoryManager() {
+        return inventoryManager; // assuming 'inventoryManager' is a field in DataService
+    }
 
+    private void populateDummyData() {
         customers.add(new Customer("1", "C-001", "Juan Dela Cruz", "09170000000", 120, 5000));
         customers.add(new Customer("2", "C-002", "Maria Clara", "09180000000", 50, 2500));
     }
@@ -261,12 +243,12 @@ class MockDataService {
 
 // log-in frame
 class LoginFrame extends JFrame {
-    MockDataService dataService;
+    DataService dataService;
     JPanel cardPanel;
     CardLayout cardLayout;
     private UserManager userManager;
 
-    public LoginFrame(MockDataService dataService, UserManager userManager) {
+    public LoginFrame(DataService dataService, UserManager userManager) {
         this.dataService = dataService;
         this.userManager = userManager;
         setTitle("Sari-Sari Smart");
@@ -483,14 +465,14 @@ class LoginFrame extends JFrame {
 }
 
 class MainFrame extends JFrame {
-    MockDataService dataService;
+    DataService dataService;
     JTabbedPane tabbedPane;
     PosPanel posPanel;
     InventoryPanel inventoryPanel;
     CustomerPanel customerPanel;
     AnalyticsPanel analyticsPanel;
 
-    public MainFrame(MockDataService dataService) {
+    public MainFrame(DataService dataService) {
         this.dataService = dataService;
         setTitle("SariSariSmart - Retail Management");
         setSize(1200, 800);
@@ -521,7 +503,12 @@ class MainFrame extends JFrame {
         logoutBtn.setBorderPainted(false);
         logoutBtn.addActionListener(e -> {
             this.dispose();
-            new LoginFrame(new MockDataService(), new UserManager()).setVisible(true);
+            // changes added try/catch
+            try {
+                new LoginFrame(new DataService(), new UserManager()).setVisible(true);
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
         });
         header.add(logoutBtn, BorderLayout.EAST);
 
@@ -810,6 +797,7 @@ class PosPanel extends JPanel {
 }
 
 // Inventory Panel
+// new changes
 class InventoryPanel extends JPanel {
     MainFrame frame;
     DefaultTableModel tableModel;
@@ -905,30 +893,53 @@ class InventoryPanel extends JPanel {
 
         save.addActionListener(e -> {
             try {
-                double price = Double.parseDouble(txtPrice.getText());
-                int stock = Integer.parseInt(txtStock.getText());
-                int reorder = Integer.parseInt(txtReorder.getText());
+                String sku = txtSku.getText().trim();
+                String name = txtName.getText().trim();
+                String category = txtCat.getText().trim();
+                double price = Double.parseDouble(txtPrice.getText().trim());
+                int stock = Integer.parseInt(txtStock.getText().trim());
+                int reorder = Integer.parseInt(txtReorder.getText().trim());
 
-                if (p == null) {
-                    Product newP = new Product(UUID.randomUUID().toString(), txtSku.getText(), txtName.getText(), price, stock, txtCat.getText(), reorder, "");
-                    frame.dataService.getProducts().add(newP);
-                } else {
-                    p.sku = txtSku.getText(); p.name = txtName.getText(); p.category = txtCat.getText();
-                    p.price = price; p.stock = stock; p.reorderPoint = reorder;
+                if (name.isEmpty() || category.isEmpty()){
+                    JOptionPane.showMessageDialog(d, "Name, and Category cannot be empty.", "Input Error", JOptionPane.ERROR_MESSAGE);
+                    throw new InvalidInputException("Fields are empty.");
                 }
+
+                frame.dataService.getInventoryManager().saveProducts(sku,
+                        name,
+                        category,
+                        price,
+                        stock,
+                        reorder);
+
+                JOptionPane.showMessageDialog(d, "Product added successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
+
                 frame.refreshAll();
                 d.dispose();
-            } catch (Exception ex) { JOptionPane.showMessageDialog(d, "Invalid input"); }
+            } catch (NumberFormatException ex) { JOptionPane.showMessageDialog(d, "Price, Stock, and Reorder must be valid numbers", "Input Error", JOptionPane.ERROR_MESSAGE);
+            } catch (Exception ex) { JOptionPane.showMessageDialog(d, "An unexpected error occurred " + ex.getMessage()); }
+
         });
         btnPanel.add(save);
 
         if (p != null) {
             JButton delete = Theme.createButton("Delete", Theme.DANGER, Color.WHITE);
-            delete.addActionListener(e -> {
+            delete.addActionListener(ex -> {
                 int confirm = JOptionPane.showConfirmDialog(d, "Are you sure you want to delete '" + p.name + "'?", "Confirm Delete", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
                 if (confirm == JOptionPane.YES_OPTION) {
-                    frame.dataService.getProducts().remove(p);
-                    frame.refreshAll();
+                    try {
+                        boolean success = frame.dataService.getInventoryManager().deleteProductsBySku(p.sku);
+
+                        if (success){
+                            JOptionPane.showMessageDialog(d, "Product removed successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
+                        } else {
+                            JOptionPane.showMessageDialog(d, "Product removal failed", "Error", JOptionPane.ERROR_MESSAGE);
+                        }
+
+                    } catch (RuntimeException e) {
+                        JOptionPane.showMessageDialog(d, "Error deleting product or saving product to file: " + e.getMessage(), "File Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                    refresh();
                     d.dispose();
                 }
             });

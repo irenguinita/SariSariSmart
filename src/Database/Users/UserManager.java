@@ -1,8 +1,9 @@
 package Database.Users;
 
-import Database.Users.CustomException.DuplicateUserException;
-import Database.Users.CustomException.LoginFailedException;
-import Database.Users.CustomException.UserNotFound;
+import Database.CustomException.DuplicateUserException;
+import Database.CustomException.LoginFailedException;
+import Database.CustomException.UserNotFound;
+import SariSariSmart.User;
 
 import java.io.*;
 import java.time.LocalDateTime;
