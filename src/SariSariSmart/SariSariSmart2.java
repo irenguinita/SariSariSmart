@@ -343,7 +343,8 @@ class LoginFrame extends JFrame {
         p.add(passField);
         p.add(forgotPasswordButton);
 
-        p.add(new JLabel(""));
+        JLabel statusLabel = new JLabel("");
+        p.add(statusLabel);
         p.add(loginBtn);
         p.add(goToSignup);
 
@@ -351,12 +352,16 @@ class LoginFrame extends JFrame {
             String user = userField.getText().trim();
             String pass = new String(passField.getPassword()).trim();
 
-            if (user.isEmpty() || pass.isEmpty()){
-                // status label here
-                throw new LoginFailedException("Field is empty");
+            if (user.isEmpty()) {
+                statusLabel.setText("Input username.");
+            } else if (pass.isEmpty()) {
+                statusLabel.setText("Input password.");
             }
 
-            if (!user.contains(" ") && user.length() >= 6) {
+            if(user.contains(" ") || user.length() < 6) {
+                statusLabel.setText("Invalid username.");
+                return;
+            } else {
                 try {
                     User loggedInUser = userManager.login(user, pass);
 
@@ -366,26 +371,14 @@ class LoginFrame extends JFrame {
 
                         this.dispose();
                         new MainFrame(dataService).setVisible(true);
-                    }
-                    else {
-                        try {
-                            userField.setText("");
-                            passField.setText("");
-                        } catch (LoginFailedException l) {
-                            // status label
-                            System.err.println("ERROR: User not found. Try again. " + l.getMessage());
-                        }
+                    } else {
+                        userField.setText("");
+                        passField.setText("");
+                        statusLabel.setText("User not found");
                     }
                 } catch (LoginFailedException l) {
+                    statusLabel.setText("Login failed. Try again. (Update to specify if password is incorrect)");
                     // status label
-                }
-            } else {
-                if (user.contains(" ")){
-                    // status label here
-                    throw new SignUpFailedException("Must not include space.");
-                } else if (user.length() < 6){
-                    // status label here
-                    throw new SignUpFailedException("User must have at least 6 characters");
                 }
             }
         });
